@@ -5,10 +5,6 @@ import numpy as np
 match_template_id = 1  # Global counter
 
 def reset_match_template_id():
-    """
-    Reset the global match_template_id counter.
-    This is useful for starting fresh in a new video or session.
-    """
     global match_template_id
     match_template_id = 1
 

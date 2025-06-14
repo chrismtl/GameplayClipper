@@ -5,9 +5,9 @@ import pandas as pd
 from pathlib import Path
 from engine.game_detector import detect_game_from_video
 from matchers.matcher_registry import MATCH_FUNCTIONS
+from matchers.template_matcher import reset_match_template_id
 from tools.frame_extractor import iterate_video
 from data.constants import RAW_VIDEO_DIR, EVENTS_JSON_PATH, OUT_DATAFRAMES_DIR
-from utils.time_utils import to_frame_number
 
 def load_fsm_for_game(game_name, event_defs):
     """
@@ -64,7 +64,6 @@ def detect_all_videos():
         game_name, first_frame = detect_game_from_video(video_path)
         fsm_dict = load_fsm_for_game(game_name, event_defs)
         event_df = detect_events(game_name, video_path, event_defs, fsm_dict, first_frame)
-        event_df["video"] = os.path.basename(video_path)
         all_events.append(event_df)
 
         filename = os.path.splitext(os.path.basename(video_path))[0]
@@ -137,9 +136,8 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
         for name, data in filtered_event_defs.items()
     }
     
-    for frame_id, frame, time in iterate_video(video_path):
+    for frame_id, frame, timestamp in iterate_video(video_path):
         if frame_id < first_frame: continue
-        timestamp = to_frame_number(time)
         allowed_events = fsm_dict.get(current_state, [])
         if not allowed_events:
             print(f"⚠️ DEAD END: No allowed events at {timestamp} for state '{current_state}' ⚠️")
@@ -184,7 +182,9 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
                     "confidence": score,
                     "video": video_file_name
                 })
-                
+    
+    reset_match_template_id()  # Reset global counter after processing
+    
     return pd.DataFrame(all_events)
 
 def prompt_event_selection(event_defs):
