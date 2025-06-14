@@ -2,3 +2,7 @@ data/raw_videos
 data/events/extracts
 data/logs
 data/saves
+
+**/__pycache__/
+*.py[cod]
+
