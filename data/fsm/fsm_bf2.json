@@ -1,0 +1,13 @@
+{
+    "start": ["menu", "ag"],
+    "menu": ["ag", "loadout"],
+    "ag": ["loadout"],
+    "loadout": ["spawn_troop","defeat"],
+    "spawn_troop": ["death", "kill_brc", "kill_sgt","defeat"],
+    "kill_brc": ["kill_brc", "kill_sgt", "death","defeat"],
+    "kill_sgt": ["kill_brc", "kill_sgt", "death","defeat"],
+    "death": ["loadout","defeat"],
+    "defeat": ["podium"],
+    "podium": ["match_end"],
+    "match_end": ["menu","loadout"]
+}

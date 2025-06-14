@@ -1,0 +1,30 @@
+{
+  "small_grey_target": {
+    "roi": [943, 673, 977, 707],
+    "frame_id": 2890,
+    "match": "fixtemplate",
+    "threshold": 0.99,
+    "fcooldown": 60
+  },
+  "small_red_cross": {
+    "roi": [942, 523, 978, 557],
+    "frame_id": 600,
+    "match": "fixtemplate",
+    "threshold": 0.99,
+    "fcooldown": 15
+  },
+  "big_red_cross": {
+    "roi": [905, 485, 1014, 594],
+    "frame_id": 2690,
+    "match": "fixtemplate",
+    "threshold": 0.993,
+    "fcooldown": 1
+  },
+  "class": {
+    "roi": [329, 913, 347, 931],
+    "frame_id": 3770,
+    "match": "switch",
+    "threshold": 0.99,
+    "activation": "spawn"
+  }
+}

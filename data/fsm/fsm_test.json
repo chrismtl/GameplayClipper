@@ -1,0 +1,4 @@
+{
+  "start": ["spawn_troop"],
+  "spawn_troop": ["spawn_troop"]
+}

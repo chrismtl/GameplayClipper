@@ -1,0 +1,156 @@
+{
+  "bf2_splash": {
+    "roi": [
+      848,
+      25,
+      1073,
+      158
+    ],
+    "frame_id": 1720,
+    "match": "fixtemplate_gray",
+    "trigger_interval": 30
+  },
+  "bf2_menu": {
+    "roi": [
+      252,
+      242,
+      405,
+      396
+    ],
+    "frame_id": 2222,
+    "match": "fixtemplate_gray",
+    "trigger_interval": 30
+  },
+  "bf2_ag": {
+    "roi": [
+      124,
+      718,
+      536,
+      800
+    ],
+    "frame_id": 2450,
+    "match": "fixtemplate_gray",
+    "trigger_interval": 100
+  },
+  "bf2_loadout": {
+    "roi": [
+      135,
+      777,
+      556,
+      823
+    ],
+    "frame_id": 10250,
+    "match": "fixtemplate_gray",
+    "trigger_interval": 10,
+    "threshold": 0.8
+  },
+  "bf2_spawn_troop": {
+    "roi": [
+      324,
+      908,
+      446,
+      936
+    ],
+    "frame_id": 4330,
+    "match": "fixtemplate_rgb",
+    "threshold": 0.99
+  },
+  "bf2_class": {
+    "roi": [
+      329,
+      913,
+      347,
+      931
+    ],
+    "frame_id": 3770,
+    "match": "switch",
+    "switches": [
+      "assault",
+      "heavy",
+      "officer",
+      "sniper",
+      "hero",
+      "commando",
+      "aerial",
+      "artillery"
+    ],
+    "threshold": 0.99
+  },
+  "bf2_kill_sgt": {
+    "roi": [
+      943,
+      673,
+      977,
+      707
+    ],
+    "frame_id": 2890,
+    "match": "fixtemplate_rgb",
+    "threshold": 0.99,
+    "fcooldown": 60
+  },
+  "bf2_kill_src": {
+    "roi": [
+      942,
+      523,
+      978,
+      557
+    ],
+    "frame_id": 600,
+    "match": "fixtemplate_rgb",
+    "threshold": 0.99,
+    "fcooldown": 15
+  },
+  "bf2_kill_brc": {
+    "roi": [
+      905,
+      485,
+      1014,
+      594
+    ],
+    "frame_id": 2690,
+    "match": "fixtemplate_rgb",
+    "threshold": 0.993,
+    "fcooldown": 1
+  },
+  "bf2_death": {
+    "roi": [
+      93,
+      985,
+      221,
+      1032
+    ],
+    "frame_id": 11342,
+    "match": "fixtemplate_gray"
+  },
+  "bf2_defeat": {
+    "roi": [
+      614,
+      322,
+      1310,
+      602
+    ],
+    "frame_id": 17886,
+    "match": "fixtemplate_gray",
+    "trigger_interval": 100
+  },
+  "bf2_podium": {
+    "roi": [
+      873,
+      703,
+      1046,
+      741
+    ],
+    "frame_id": 18512,
+    "match": "fixtemplate_gray"
+  },
+  "bf2_match_end": {
+    "roi": [
+      818,
+      74,
+      1100,
+      112
+    ],
+    "frame_id": 18630,
+    "match": "fixtemplate_gray"
+  }
+}

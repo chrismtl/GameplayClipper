@@ -1,0 +1,9 @@
+# Image processing
+opencv-contrib-python
+
+# Data handling
+pandas
+numpy
+
+# Utility libraries
+tqdm        # For progress bars
