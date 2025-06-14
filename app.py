@@ -36,7 +36,7 @@ def create_event_menu():
         print("\n📦 CREATE EVENT")
         print("1) Select ROI")
         print("2) Create crop from ROI")
-        print("3) Create template from crop")
+        print("3) Create template from mask")
         print("4) Back to Main Menu")
         choice = input(">> ").strip()
 

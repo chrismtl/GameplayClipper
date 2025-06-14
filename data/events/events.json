@@ -131,7 +131,7 @@
     ],
     "frame_id": 17886,
     "match": "fixtemplate_gray",
-    "trigger_interval": 100
+    "trigger_interval": 60
   },
   "bf2_podium": {
     "roi": [
@@ -141,7 +141,9 @@
       741
     ],
     "frame_id": 18512,
-    "match": "fixtemplate_gray"
+    "match": "fixtemplate_gray",
+    "threshold": 0.95,
+    "trigger_interval": 60
   },
   "bf2_match_end": {
     "roi": [
@@ -151,6 +153,20 @@
       112
     ],
     "frame_id": 18630,
-    "match": "fixtemplate_gray"
+    "match": "fixtemplate_gray",
+    "threshold": 0.95,
+    "trigger_interval": 30
+  },
+  "bf2_vaincu": {
+    "roi": [
+      861,
+      302,
+      1043,
+      395
+    ],
+    "frame_id": 12424,
+    "match": "fixtemplate_gray",
+    "threshold": 0.97,
+    "fcooldown": 80
   }
 }

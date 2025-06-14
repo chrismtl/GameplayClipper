@@ -1,4 +1,4 @@
 {
-  "start": ["spawn_troop"],
-  "spawn_troop": ["spawn_troop"]
+  "start": ["vaincu"],
+  "vaincu": ["vaincu"]
 }

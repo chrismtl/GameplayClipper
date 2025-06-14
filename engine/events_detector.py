@@ -1,13 +1,14 @@
 import os
 import json
 import glob
+import shutil
 import pandas as pd
 from pathlib import Path
 from engine.game_detector import detect_game_from_video
 from matchers.matcher_registry import MATCH_FUNCTIONS
 from matchers.template_matcher import reset_match_template_id
 from tools.frame_extractor import iterate_video
-from data.constants import RAW_VIDEO_DIR, EVENTS_JSON_PATH, OUT_DATAFRAMES_DIR
+from data.constants import RAW_VIDEO_DIR, EVENTS_JSON_PATH, OUT_DATAFRAMES_DIR, DEFAULT_EVENT_THRESHOLD, INIT_COOLDOWN_VALUE
 
 def load_fsm_for_game(game_name, event_defs):
     """
@@ -53,11 +54,6 @@ def detect_all_videos():
     with open(EVENTS_JSON_PATH, "r") as f:
         event_defs = json.load(f)
 
-    # events_list = prompt_event_selection(event_defs)
-    # if not events_list:
-    #     print("❌ No valid events selected. Aborting.")
-    #     return
-
     all_events = []
     for video_path in glob.glob(os.path.join(RAW_VIDEO_DIR, "*.mp4")):
         print(f"🎞 Processing {os.path.basename(video_path)}...")
@@ -84,11 +80,6 @@ def detect_single_video():
     with open(EVENTS_JSON_PATH, "r") as f:
         event_defs = json.load(f)
 
-    # events_list = prompt_event_selection(event_defs)
-    # if not events_list:
-    #     print("❌ No valid events selected. Aborting.")
-    #     return
-
     print(f"🔍 Detecting events in {filename}...\n")
     game_name, first_frame = detect_game_from_video(path)
     fsm_dict = load_fsm_for_game(game_name, event_defs)
@@ -111,6 +102,8 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
     if fsm_dict is None:
         raise ValueError("FSM dictionary is required for event detection.")
     
+    delete_log_folder()
+    
     current_state = first_state
     prefix = f"{game_name}_"
     
@@ -122,7 +115,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
     }
     
     event_list = list(filtered_event_defs.keys())
-    fsincelast = {event: 0 for event in event_list}
+    fsincelast = {event: INIT_COOLDOWN_VALUE for event in event_list}
     
     # Cache relevant event data
     events_cache = {
@@ -159,7 +152,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
                 continue
             
             match_fn = data["match_fn"]
-            threshold = data.get("threshold",0.9)
+            threshold = data.get("threshold",DEFAULT_EVENT_THRESHOLD)
             x1, y1, x2, y2 = data["roi"]
             
             if match_fn is None:
@@ -168,8 +161,6 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
             
             roi_img = frame[y1:y2, x1:x2]
             matched, score = match_fn(roi_img, glob_event_name, video_file_name, threshold)
-            
-            # print("event:", glob_event_name, "matched:", matched, "score:", score, "at", timestamp)
             
             if matched:
                 print(f"✅ Detected {event_name} at {timestamp} with score {score:.2f}")
@@ -188,10 +179,6 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
     return pd.DataFrame(all_events)
 
 def prompt_event_selection(event_defs):
-    # user_input = input("Detect ALL events (Y/n)?: ").strip().lower()
-    # if user_input in ('y', 'yes', ''):
-    #     return list(event_defs.keys())
-
     print("Events to detect (press Enter to finish):")
     selected_events = []
     while True:
@@ -204,6 +191,12 @@ def prompt_event_selection(event_defs):
         else:
             print(f"❌ Invalid event name, try again")
     return selected_events
+
+def delete_log_folder():
+    log_folder = Path("data", "logs")
+    if log_folder.exists():
+        shutil.rmtree(log_folder)
+        print("🗑️ Deleting previous logs")
 
 def save_events_to_csv(df, filename):
     """

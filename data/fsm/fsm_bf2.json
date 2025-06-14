@@ -1,13 +1,17 @@
 {
-    "start": ["menu", "ag"],
-    "menu": ["ag", "loadout"],
-    "ag": ["loadout"],
-    "loadout": ["spawn_troop","defeat"],
-    "spawn_troop": ["death", "kill_brc", "kill_sgt","defeat"],
-    "kill_brc": ["kill_brc", "kill_sgt", "death","defeat"],
-    "kill_sgt": ["kill_brc", "kill_sgt", "death","defeat"],
-    "death": ["loadout","defeat"],
-    "defeat": ["podium"],
-    "podium": ["match_end"],
-    "match_end": ["menu","loadout"]
+    "start":        ["menu", "ag"],
+    "menu":         ["ag", "loadout"],
+    
+    "ag":           ["loadout", "menu"],
+    "loadout":      ["spawn_troop","defeat"],
+
+    "spawn_troop":  ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "defeat"],
+    "kill_brc":     ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "defeat"],
+    "kill_sgt":     ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "defeat"],
+
+    "vaincu":       ["loadout", "defeat"],
+    "death":        ["loadout","defeat"],
+    "defeat":       ["podium"],
+    "podium":       ["match_end"],
+    "match_end":    ["menu","loadout"]
 }
