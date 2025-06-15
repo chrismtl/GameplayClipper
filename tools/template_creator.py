@@ -1,5 +1,6 @@
 import os
 import cv2
+import utils.image_cacher as imgc
 import data.constants as cst
 
 def create_template():
@@ -10,11 +11,10 @@ def create_template():
         # Define paths
         crop_path = os.path.join(cst.CROPS_DIR, f"{event_class}_crop.png")
         mask_path = os.path.join(cst.MASKS_DIR, f"{event_class}_mask.png")
-        output_path = os.path.join(cst.TEMPLATES_DIR, f"{event_class}_template.png")
 
         # Load crop (in color) and mask (in grayscale)
-        crop = cv2.imread(crop_path, cv2.IMREAD_COLOR)
-        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        crop = imgc.load(crop_path, cv2.IMREAD_COLOR)
+        mask = imgc.load(mask_path, cv2.IMREAD_GRAYSCALE)
 
         if crop is None:
             raise FileNotFoundError(f"Crop not found: {crop_path}")
@@ -36,6 +36,7 @@ def create_template():
         cv2.destroyAllWindows()
 
         # Save result
+        output_path = os.path.join(cst.TEMPLATES_UNIQUE_DIR, f"{event_class}_template.png")
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         cv2.imwrite(output_path, template)
         print(f"✅ Template saved to: {output_path}")

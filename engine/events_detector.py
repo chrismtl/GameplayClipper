@@ -129,8 +129,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
         if frame_id < first_frame: continue
         allowed_events = fsm_dict.get(current_state, [])
         if not allowed_events:
-            print(f"⚠️ DEAD END: No allowed events at {timestamp} for state '{current_state}' ⚠️")
-            break
+            raise ValueError(f"⚠️ DEAD END: No allowed events at {timestamp} for state '{current_state}' ⚠️")
         
         for event_name in allowed_events:
             glob_event_name = f"{game_name}_{event_name}"
@@ -156,17 +155,18 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
                 continue
             
             frame_crop = frame[y1:y2, x1:x2]
-            matched, score, event_name = match_fn(frame_crop, glob_event_name, video_file_name, threshold)
+            
+            matched, score, final_event_name = match_fn(frame_crop, glob_event_name, video_file_name, threshold)
             
             if matched:
-                print(f"✅ Detected {event_name} at {timestamp} with score {score:.2f}")
+                print(f"✅ Detected {final_event_name} at {timestamp} with score {score:.2f}")
                 fsincelast[event_name] = 0
                 current_state = event_name
                 all_events.append({
                     "game": game_name,
-                    "event": event_name,
+                    "event": final_event_name,
                     "timestamp": timestamp,
-                    "confidence": score,
+                    "confidence": round(score, cst.CONFIDENCE_PRECISION),
                     "video": video_file_name
                 })
     
@@ -191,7 +191,7 @@ def prompt_event_selection(event_defs):
 def delete_log_folder():
     if os.path.exists(cst.LOGS_DIR):
         shutil.rmtree(cst.LOGS_DIR)
-        print("🗑️ Deleting previous logs")
+        print("🗑️  Deleting previous logs")
 
 def save_events_to_csv(df, filename):
     """

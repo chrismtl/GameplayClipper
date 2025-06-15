@@ -1,4 +1,14 @@
 {
+  "desktop": {
+    "roi": [
+      725,
+      1042,
+      753,
+      1069
+    ],
+    "frame_id": 170,
+    "match": "fixtemplate_rgb"
+  },
   "bf2_splash": {
     "roi": [
       848,
@@ -10,7 +20,7 @@
     "match": "fixtemplate_gray",
     "trigger_interval": 30
   },
-  "bf2_menu": {
+  "bf2_main_menu": {
     "roi": [
       252,
       242,
@@ -57,22 +67,22 @@
   },
   "bf2_class": {
     "roi": [
-      329,
-      913,
+      328,
+      912,
       347,
       931
     ],
-    "frame_id": 3770,
+    "frame_id": 0,
     "match": "switch",
     "switches": [
       "assault",
       "heavy",
       "officer",
       "sniper",
-      "hero",
-      "commando",
       "aerial",
-      "artillery"
+      "executor",
+      "commando",
+      "hero"
     ],
     "threshold": 0.99
   },
@@ -86,7 +96,7 @@
     "frame_id": 2890,
     "match": "fixtemplate_rgb",
     "threshold": 0.99,
-    "fcooldown": 60
+    "fcooldown": 70
   },
   "bf2_kill_src": {
     "roi": [
@@ -124,14 +134,14 @@
   },
   "bf2_defeat": {
     "roi": [
-      614,
-      322,
-      1310,
-      602
+      665,
+      343,
+      1259,
+      529
     ],
     "frame_id": 17886,
     "match": "fixtemplate_gray",
-    "trigger_interval": 30
+    "trigger_interval": 50
   },
   "bf2_podium": {
     "roi": [
@@ -169,14 +179,35 @@
     "threshold": 0.97,
     "fcooldown": 80
   },
-  "desktop": {
+  "bf2_game_menu": {
     "roi": [
-      725,
-      1042,
-      753,
-      1069
+      96,
+      66,
+      127,
+      97
     ],
-    "frame_id": 170,
+    "frame_id": 2023,
+    "match": "fixtemplate_gray"
+  },
+  "bf2_respawn": {
+    "roi": [
+      94,
+      270,
+      441,
+      354
+    ],
+    "frame_id": 2037,
     "match": "fixtemplate_rgb"
+  },
+  "bf2_win": {
+    "roi": [
+      624,
+      393,
+      1291,
+      525
+    ],
+    "frame_id": 25022,
+    "match": "fixtemplate_gray",
+    "trigger_interval": 50
   }
 }

@@ -153,11 +153,14 @@ def save_event_data(event_name: str, roi: tuple, frame_id: int):
     else:
         raise ValueError("⚠️ cst.EVENTS_JSON_PATH does not exist.")
 
-    event_defs[event_name] = {
+    if event_name not in event_defs:
+        event_defs[event_name] = {}
+
+    event_defs[event_name].update({
         "roi": list(roi),
         "frame_id": frame_id
-    }
-
+    })
+    
     js.update(cst.EVENTS_JSON_PATH, event_defs)
     
     print("✅ New event created in events.json.")

@@ -74,8 +74,8 @@ def main():
         elif choice == "4":
             create_event_menu()
         elif choice == "5":
-            print("👋 Exiting...")
             os.system("cls" if os.name == "nt" else "clear")
+            print("👋 Exiting...")
             break
         else:
             input("❌ 1 to 5 only.")
