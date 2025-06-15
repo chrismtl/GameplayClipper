@@ -29,7 +29,7 @@
     ],
     "frame_id": 2222,
     "match": "fixtemplate_gray",
-    "trigger_interval": 30
+    "trigger_interval": 10
   },
   "bf2_ag": {
     "roi": [

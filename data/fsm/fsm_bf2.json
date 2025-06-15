@@ -1,6 +1,5 @@
 {
-    "fsm_states":   ["alive"],
-    "alive":        ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "win", "defeat"],
+    "fsm_alive":    ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "win", "defeat", "game_menu"],
 
     "start":        ["main_menu", "ag"],
     "main_menu":    ["ag", "loadout"],
@@ -9,12 +8,12 @@
     "loadout":      ["spawn_troop","defeat"],
     "spawn_troop":  ["class"],
 
-    "class":        ["alive"],
-    "kill_brc":     ["alive"],
-    "kill_sgt":     ["alive"],
+    "class":        ["fsm_alive"],
+    "kill_brc":     ["fsm_alive"],
+    "kill_sgt":     ["fsm_alive"],
 
-    "game_menu":    ["loadout", "defeat"],
-    "respawn":      ["loadout"],
+    "game_menu":    ["loadout", "spawn_troop", "podium", "main_menu"],
+    "respawn":      ["loadout", "spawn_troop", "podium", "main_menu"],
     
     "vaincu":       ["loadout", "defeat"],
     "death":        ["loadout", "defeat"],

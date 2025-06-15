@@ -1,4 +1,5 @@
 import os
+import time
 import glob
 import shutil
 import pandas as pd
@@ -34,14 +35,21 @@ def load_fsm_for_game(game_name, event_defs):
 
     for state, transitions in fsm_dict.items():
         # Skip validation for pseudo-state 'start'
-        state = f"{game_name}_{state}"  # Add game_name prefix to state
-        if state != f"{game_name}_start" and state not in known_events:
+        if state == "start":
+            pass
+        elif f"{game_name}_{state}" in known_events:
+            pass
+        elif state.startswith("fsm_"):
+            pass
+        else:
             raise ValueError(f"❌ FSM state '{state}' is not a valid event name.")
 
         for target_event in transitions:
-            # Add game_name prefix to target_event
-            target_event = f"{game_name}_{target_event}"
-            if target_event not in known_events:
+            if f"{game_name}_{target_event}" in known_events:
+                pass
+            elif target_event.startswith("fsm_"):
+                pass
+            else:
                 raise ValueError(f"❌ FSM transition from '{state}' targets unknown event '{target_event}'.")
 
     return fsm_dict
@@ -79,20 +87,22 @@ def detect_single_video():
     print(f"🔍 Detecting events in {filename}...\n")
     game_name, first_frame = detect_game_from_video(path)
     fsm_dict = load_fsm_for_game(game_name, event_defs)
-    df = detect_events(game_name, path, event_defs, fsm_dict, first_frame)
-    if not df.empty:
-        print(f"✅ {len(df)} events detected.")
-        save_events_to_csv(df, filename)
+    events_df = detect_events(game_name, path, event_defs, fsm_dict, first_frame)
+    if not events_df.empty:
+        print(f"✅ {len(events_df)} events detected.")
+        save_events_to_csv(events_df, filename)
     else:
         print("⚠️ No events detected.")
 
 
 def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, first_state="start"):
+    start_time = time.time()
     video_file_name = os.path.basename(video_path)
     if not video_file_name.endswith(".mp4"):
         raise ValueError("❌ Video file must be .mp4")
     video_file_name = video_file_name[:-4]  # Remove .mp4 extension
     
+    print(f"Detecting events for {video_file_name}")
     all_events = []
     
     if fsm_dict is None:
@@ -127,12 +137,19 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
     
     for frame_id, frame, timestamp in iterate_video(video_path):
         if frame_id < first_frame: continue
+        
+        # Get allowed events for the current state
         allowed_events = fsm_dict.get(current_state, [])
         if not allowed_events:
             raise ValueError(f"⚠️ DEAD END: No allowed events at {timestamp} for state '{current_state}' ⚠️")
         
+        allowed_events[:] = [
+            sub
+            for e in allowed_events
+            for sub in (fsm_dict.get(e, []) if e.startswith("fsm_") else [e])
+        ]
+        
         for event_name in allowed_events:
-            glob_event_name = f"{game_name}_{event_name}"
             data = events_cache[event_name]
             trigger_interval = data.get("trigger_interval",0)
             fcooldown = data.get("fcooldown",0)
@@ -155,7 +172,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
                 continue
             
             frame_crop = frame[y1:y2, x1:x2]
-            
+            glob_event_name = f"{game_name}_{event_name}"
             matched, score, final_event_name = match_fn(frame_crop, glob_event_name, video_file_name, threshold)
             
             if matched:
@@ -171,7 +188,8 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
                 })
     
     reset_match_template_id()  # Reset global counter after processing
-    
+    end_time = time.time()
+    print(f"⏱️  Runtime for {video_file_name}: {end_time - start_time:.3f} seconds")
     return pd.DataFrame(all_events)
 
 def prompt_event_selection(event_defs):
