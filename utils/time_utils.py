@@ -1,13 +1,6 @@
-def seconds_to_timestamp(seconds):
-    mins, secs = divmod(int(seconds), 60)
-    return f"{mins:02}:{secs:02}"
-
-def timestamp_to_seconds(timestamp):
-    mins, secs = map(int, timestamp.split(':'))
-    return mins * 60 + secs
-
-def to_frame_number(ts):
-    total_frames = int(round(ts * 30))
-    second = total_frames // 30
-    frame = total_frames % 30
-    return f"{second}.{frame}"
+def timestamp(frame_id, fps):
+    hours = frame_id // (3600 * fps)
+    minutes = (frame_id // (60 * fps)) % 60
+    seconds = (frame_id // fps) % 60
+    frames = frame_id % fps
+    return f"{hours:02}:{minutes:02}:{seconds:02}:{frames:02}"

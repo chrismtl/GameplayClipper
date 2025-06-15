@@ -1,14 +1,13 @@
 import os
-import json
 import glob
 import shutil
 import pandas as pd
-from pathlib import Path
 from engine.game_detector import detect_game_from_video
 from matchers.matcher_registry import MATCH_FUNCTIONS
-from matchers.template_matcher import reset_match_template_id
+from matchers.match_utils import reset_match_template_id
 from tools.frame_extractor import iterate_video
-from data.constants import RAW_VIDEO_DIR, EVENTS_JSON_PATH, OUT_DATAFRAMES_DIR, DEFAULT_EVENT_THRESHOLD, INIT_COOLDOWN_VALUE
+import utils.json_cacher as js
+import data.constants as cst
 
 def load_fsm_for_game(game_name, event_defs):
     """
@@ -25,12 +24,11 @@ def load_fsm_for_game(game_name, event_defs):
         FileNotFoundError: If the FSM file does not exist.
         ValueError: If the FSM refers to unknown states or events (excluding 'start').
     """
-    fsm_file = os.path.join("data", "fsm", f"fsm_{game_name}.json")
+    fsm_file = os.path.join(cst.FSM_DIR, f"fsm_{game_name}.json")
     if not os.path.exists(fsm_file):
         raise FileNotFoundError(f"❌ FSM file not found for game '{game_name}' at {fsm_file}")
 
-    with open(fsm_file, "r") as f:
-        fsm_dict = json.load(f)
+    fsm_dict = js.load(fsm_file)
 
     known_events = set(event_defs.keys())
 
@@ -51,11 +49,10 @@ def load_fsm_for_game(game_name, event_defs):
 def detect_all_videos():
     print("🔍 Detecting events in all videos...\n")
 
-    with open(EVENTS_JSON_PATH, "r") as f:
-        event_defs = json.load(f)
+    event_defs = js.load(cst.EVENTS_JSON_PATH)
 
     all_events = []
-    for video_path in glob.glob(os.path.join(RAW_VIDEO_DIR, "*.mp4")):
+    for video_path in glob.glob(os.path.join(cst.RAW_VIDEO_DIR, "*.mp4")):
         print(f"🎞 Processing {os.path.basename(video_path)}...")
         game_name, first_frame = detect_game_from_video(video_path)
         fsm_dict = load_fsm_for_game(game_name, event_defs)
@@ -71,14 +68,13 @@ def detect_all_videos():
 
 def detect_single_video():
     filename = input("Enter mp4 video file name (e.g. recording_1): ").strip()
-    path = os.path.join(RAW_VIDEO_DIR, filename + ".mp4")
+    path = os.path.join(cst.RAW_VIDEO_DIR, filename + ".mp4")
 
     if not os.path.exists(path):
         print(f"❌ File not found: {path}")
         return
 
-    with open(EVENTS_JSON_PATH, "r") as f:
-        event_defs = json.load(f)
+    event_defs = js.load(cst.EVENTS_JSON_PATH)
 
     print(f"🔍 Detecting events in {filename}...\n")
     game_name, first_frame = detect_game_from_video(path)
@@ -115,7 +111,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
     }
     
     event_list = list(filtered_event_defs.keys())
-    fsincelast = {event: INIT_COOLDOWN_VALUE for event in event_list}
+    fsincelast = {event: cst.INIT_COOLDOWN_VALUE for event in event_list}
     
     # Cache relevant event data
     events_cache = {
@@ -152,15 +148,15 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
                 continue
             
             match_fn = data["match_fn"]
-            threshold = data.get("threshold",DEFAULT_EVENT_THRESHOLD)
+            threshold = data.get("threshold",cst.DEFAULT_EVENT_THRESHOLD)
             x1, y1, x2, y2 = data["roi"]
             
             if match_fn is None:
                 print(f"⚠️ Matcher not found for '{event_name}'. Skipping...")
                 continue
             
-            roi_img = frame[y1:y2, x1:x2]
-            matched, score = match_fn(roi_img, glob_event_name, video_file_name, threshold)
+            frame_crop = frame[y1:y2, x1:x2]
+            matched, score, event_name = match_fn(frame_crop, glob_event_name, video_file_name, threshold)
             
             if matched:
                 print(f"✅ Detected {event_name} at {timestamp} with score {score:.2f}")
@@ -193,9 +189,8 @@ def prompt_event_selection(event_defs):
     return selected_events
 
 def delete_log_folder():
-    log_folder = Path("data", "logs")
-    if log_folder.exists():
-        shutil.rmtree(log_folder)
+    if os.path.exists(cst.LOGS_DIR):
+        shutil.rmtree(cst.LOGS_DIR)
         print("🗑️ Deleting previous logs")
 
 def save_events_to_csv(df, filename):
@@ -206,14 +201,13 @@ def save_events_to_csv(df, filename):
         df (pd.DataFrame): Events DataFrame to save.
         filename (str): Base filename (without extension).
     """
-    output_dir = Path(OUT_DATAFRAMES_DIR)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    os.makedirs(cst.OUT_DF_DIR, exist_ok=True)
 
-    output_path = output_dir / f"{filename}.csv"
+    output_path = os.path.join(cst.OUT_DF_DIR, f"{filename}.csv")
+    
     counter = 1
-
-    while output_path.exists():
-        output_path = output_dir / f"{filename}_{counter}.csv"
+    while os.path.exists(output_path):
+        output_path = os.path.join(cst.OUT_DF_DIR, f"{filename}_{counter}.csv")
         counter += 1
 
     df.to_csv(output_path, index=False)

@@ -1,11 +1,5 @@
 import cv2
-
-def format_timestamp_from_frame(frame_id, fps):
-    hours = frame_id // (3600 * fps)
-    minutes = (frame_id // (60 * fps)) % 60
-    seconds = (frame_id // fps) % 60
-    frames = frame_id % fps
-    return f"{hours:02}:{minutes:02}:{seconds:02}:{frames:02}"
+import utils.time_utils as time_utils
 
 def iterate_video(path):
     cap = cv2.VideoCapture(path)
@@ -19,7 +13,7 @@ def iterate_video(path):
         if not ret:
             break
         if frame_id % step == 0:
-            timestamp_str = format_timestamp_from_frame(frame_id, fps)
+            timestamp_str = time_utils.timestamp(frame_id, fps)
             yield frame_id, frame, timestamp_str
         frame_id += 1
 

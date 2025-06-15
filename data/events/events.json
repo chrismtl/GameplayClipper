@@ -131,7 +131,7 @@
     ],
     "frame_id": 17886,
     "match": "fixtemplate_gray",
-    "trigger_interval": 60
+    "trigger_interval": 30
   },
   "bf2_podium": {
     "roi": [
@@ -168,5 +168,15 @@
     "match": "fixtemplate_gray",
     "threshold": 0.97,
     "fcooldown": 80
+  },
+  "desktop": {
+    "roi": [
+      725,
+      1042,
+      753,
+      1069
+    ],
+    "frame_id": 170,
+    "match": "fixtemplate_rgb"
   }
 }

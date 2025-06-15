@@ -1,19 +1,18 @@
 import os
 import pandas as pd
-from data.constants import RAW_VIDEO_DIR, CLIPS_FOLDER, CLIP_DURATION
+import data.constants as cst
 from tools.clip_extractor import extract_clips
 from llm.query_translator import translate_query
 
 def query():
-    events_folder = os.path.join("data", "out", "dataframes")
-    if not os.path.exists(events_folder):
+    if not os.path.exists(cst.OUT_DF_DIR):
         print("❌ No event CSVs found. Run detection first.")
         return
 
     all_event_dfs = []
-    for csv_file in os.listdir(events_folder):
+    for csv_file in os.listdir(cst.OUT_DF_DIR):
         if csv_file.endswith(".csv"):
-            df = pd.read_csv(os.path.join(events_folder, csv_file))
+            df = pd.read_csv(os.path.join(cst.OUT_DF_DIR, csv_file))
             all_event_dfs.append(df)
 
     if not all_event_dfs:
@@ -34,12 +33,12 @@ def query():
         return
 
     print(f"\n🎯 Found {len(filtered)} events.")
-    os.makedirs(CLIPS_FOLDER, exist_ok=True)
+    os.makedirs(cst.CLIPS_DIR, exist_ok=True)
 
     for i, row in filtered.iterrows():
-        video_file = os.path.join(RAW_VIDEO_DIR, row["video"])
-        clip_path = os.path.join(CLIPS_FOLDER, f"clip_{i}.mp4")
-        extract_clips(pd.DataFrame([row]), video_file, clip_path, duration=CLIP_DURATION)
+        video_file = os.path.join(cst.RAW_VIDEO_DIR, row["video"])
+        clip_path = os.path.join(cst.CLIPS_DIR, f"clip_{i}.mp4")
+        extract_clips(pd.DataFrame([row]), video_file, clip_path, duration=cst.CLIP_DURATION)
 
     print("✅ Clips extracted.")
 

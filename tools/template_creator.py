@@ -1,5 +1,6 @@
 import os
 import cv2
+import data.constants as cst
 
 def create_template():
     print("\n🛠️ Template Creator")
@@ -7,9 +8,9 @@ def create_template():
 
     try:
         # Define paths
-        crop_path = os.path.join("data", "events", "crop", f"{event_class}_crop.png")
-        mask_path = os.path.join("data", "events", "masks", f"{event_class}_mask.png")
-        output_path = os.path.join("data", "events", "templates", f"{event_class}_template.png")
+        crop_path = os.path.join(cst.CROPS_DIR, f"{event_class}_crop.png")
+        mask_path = os.path.join(cst.MASKS_DIR, f"{event_class}_mask.png")
+        output_path = os.path.join(cst.TEMPLATES_DIR, f"{event_class}_template.png")
 
         # Load crop (in color) and mask (in grayscale)
         crop = cv2.imread(crop_path, cv2.IMREAD_COLOR)

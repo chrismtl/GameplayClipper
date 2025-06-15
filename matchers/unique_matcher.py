@@ -1,14 +1,10 @@
 import os
 import cv2
 import numpy as np
+import data.constants as cst
+from matchers.match_utils import increment_match_template_id, save_match_log
 
-match_template_id = 1  # Global counter
-
-def reset_match_template_id():
-    global match_template_id
-    match_template_id = 1
-
-def match_template_mask(frame_crop, event_name, video_file_name, threshold=0.95):
+def match_template_mask(frame_crop, glob_event_name, video_file_name, threshold=0.95):
     """
     Match a color template using a mask over a cropped region (in RBG color).
 
@@ -21,11 +17,12 @@ def match_template_mask(frame_crop, event_name, video_file_name, threshold=0.95)
         matched (bool): Whether the match exceeds threshold.
         score (float): Similarity score.
     """
-    global match_template_id  # Persist counter across calls
-
-    # Build paths
-    template_path = os.path.join("data", "events", "templates", f"{event_name}_template.png")
-    mask_path = os.path.join("data", "events", "masks", f"{event_name}_mask.png")
+    # Get event name without the game prefix
+    event_name = glob_event_name.split("_", 1)[1]
+    
+    # Load template and mask
+    template_path = os.path.join(cst.TEMPLATES_DIR, "unique", f"{glob_event_name}_template.png")
+    mask_path = os.path.join(cst.MASKS_DIR, f"{glob_event_name}_mask.png")
 
     # Load as color
     template = cv2.imread(template_path, cv2.IMREAD_COLOR)
@@ -49,22 +46,35 @@ def match_template_mask(frame_crop, event_name, video_file_name, threshold=0.95)
 
     # Save only if match is successful
     if matched:
-        os.makedirs(f"data/logs/{video_file_name}", exist_ok=True)
-        log_path = os.path.join("data", "logs", video_file_name, f"{event_name}_{match_template_id}.png")
-        cv2.imwrite(log_path, frame_crop)
-        match_template_id += 1
+        save_match_log(frame_crop, event_name, video_file_name)
+        increment_match_template_id()        
 
-    return matched, score
+    return matched, score, event_name
 
-def match_template_gray_no_mask(frame_crop, event_name, video_file_name, threshold=0.95):
-    global match_template_id
+def match_template_gray_no_mask(frame_crop, glob_event_name, video_file_name, threshold=0.95):
+    """
+    Match a grayscale template against a cropped frame using SQDIFF.
 
+    Args:
+        frame_crop (np.ndarray): RGB cropped frame region.
+        event_name (str): Event name to locate the template.
+        video_file_name (str): Video name for logging.
+        threshold (float): Match threshold (default: 0.95).
+
+    Returns:
+        matched (bool): True if score exceeds threshold.
+        score (float): Similarity score (higher is better).
+        event_name (str): Same as input.
+    """
+    # Get event name without the game prefix
+    event_name = glob_event_name.split("_", 1)[1]
+    
     # Load template
-    template_path = os.path.join("data", "events", "templates", f"{event_name}_template.png")
+    template_path = os.path.join(cst.TEMPLATES_DIR, "unique", f"{glob_event_name}_template.png")
     template_gray = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
 
     if template_gray is None:
-        raise FileNotFoundError(f"Template not found for event '{event_name}'")
+        raise FileNotFoundError(f"Template not found for event '{glob_event_name}'")
 
     # Convert both to grayscale
     frame_gray = cv2.cvtColor(frame_crop, cv2.COLOR_BGR2GRAY)
@@ -85,9 +95,7 @@ def match_template_gray_no_mask(frame_crop, event_name, video_file_name, thresho
     matched = score >= threshold
 
     if matched:
-        os.makedirs(f"data/logs/{video_file_name}", exist_ok=True)
-        log_path = os.path.join("data", "logs", video_file_name, f"{event_name}_{match_template_id}.png")
-        cv2.imwrite(log_path, frame_crop)
-        match_template_id += 1
+        save_match_log(frame_crop, event_name, video_file_name)
+        increment_match_template_id()
 
-    return matched, score
+    return matched, score, event_name

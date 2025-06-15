@@ -1,7 +1,7 @@
-import cv2
-import json
 import os
-from data.constants import EVENTS_JSON_PATH
+import cv2
+import utils.json_cacher as js
+import data.constants as cst
 
 def roi_selector_gui(video_path: str, event_name: str, initial_frame_index: int = 0, draw_roi: tuple[int, int, int, int] = None):
     cap = cv2.VideoCapture(video_path)
@@ -140,9 +140,7 @@ def roi_selector_gui(video_path: str, event_name: str, initial_frame_index: int 
 
         confirm = input(f"\n💾 Save this ROI as '{event_name}'? [y/N]: ").strip().lower()
         if confirm == "y":
-            confirm = save_event_data(event_name, roi[0], frame_index[0])
-            if confirm: print("✅ Event saved.")
-            else: print("❌ Save failed")
+            save_event_data(event_name, roi[0], frame_index[0])
         else:
             print("❌ Save aborted.")
     else:
@@ -150,25 +148,19 @@ def roi_selector_gui(video_path: str, event_name: str, initial_frame_index: int 
 
 def save_event_data(event_name: str, roi: tuple, frame_id: int):
     # Load existing data
-    if EVENTS_JSON_PATH.exists():
-        with open(EVENTS_JSON_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
+    if os.path.exists(cst.EVENTS_JSON_PATH):
+        event_defs = js.load(cst.EVENTS_JSON_PATH)
     else:
-        print("⚠️ Could not save because events.json is missing")
-        return False
+        raise ValueError("⚠️ cst.EVENTS_JSON_PATH does not exist.")
 
-    data[event_name] = {
+    event_defs[event_name] = {
         "roi": list(roi),
         "frame_id": frame_id
     }
 
-    # Ensure directory exists
-    EVENTS_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(EVENTS_JSON_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    js.update(cst.EVENTS_JSON_PATH, event_defs)
     
-    return True
+    print("✅ New event created in events.json.")
 
 def roi_selector():
     event_name = input("🏷️  Enter new event name: ").strip()

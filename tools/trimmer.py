@@ -1,7 +1,6 @@
 import cv2
 import os
 from tkinter import Tk, filedialog
-from pathlib import Path
 
 # Ask user for trim duration in minutes
 try:
@@ -25,9 +24,10 @@ if not video_path:
     exit()
 
 # Prepare output file path
-video_file = Path(video_path)
-trimmed_name = video_file.stem + "_trimmed" + video_file.suffix
-OUTPUT_PATH = video_file.parent / trimmed_name
+video_file = os.path.basename(video_path)
+file_stem, file_ext = os.path.splitext(video_file)
+parent_dir = os.path.dirname(video_path)
+output_path = os.path.join(parent_dir, f"{file_stem}_trimmed{file_ext}")
 
 # Setup video capture and writer
 cap = cv2.VideoCapture(video_path)
@@ -36,7 +36,7 @@ width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 
-out = cv2.VideoWriter(str(OUTPUT_PATH), fourcc, fps, (width, height))
+out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 frame_limit = int(fps * DURATION_SECONDS)
 
 print(f"✂️ Trimming first {DURATION_SECONDS} seconds from {video_file.name}")

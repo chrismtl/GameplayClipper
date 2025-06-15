@@ -4,8 +4,9 @@
     
     "ag":           ["loadout", "menu"],
     "loadout":      ["spawn_troop","defeat"],
+    "spawn_troop":  ["class"],
 
-    "spawn_troop":  ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "defeat"],
+    "class":        ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "defeat"],
     "kill_brc":     ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "defeat"],
     "kill_sgt":     ["kill_brc", "kill_sgt", "vaincu", "death", "loadout", "defeat"],
 

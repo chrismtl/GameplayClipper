@@ -6,7 +6,6 @@ from tools.roi_selector import roi_selector
 from tools.cropper import cropper
 from tools.template_creator import create_template
 from tools.clip_extractor import extract_clips
-from data.constants import RAW_VIDEO_DIR
 
 def detect_events_menu():
     while True:

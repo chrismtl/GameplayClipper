@@ -1,6 +1,7 @@
-import cv2
-import json
 import os
+import cv2
+import utils.json_cacher as js
+import data.constants as cst
 
 def cropper(match_fn_names):
     """
@@ -16,28 +17,26 @@ def cropper(match_fn_names):
         event_class_name = input("Enter event name (e.g. kill): ").strip()
         
         # Load ROI
-        roi_path = os.path.join("data", "events", "events.json")
-        with open(roi_path, "r") as f:
-            roi_data = json.load(f)
+        event_defs = js.load(cst.EVENTS_JSON_PATH)
 
-        if event_class_name not in roi_data:
+        if event_class_name not in event_defs:
             raise ValueError(f"Event class '{event_class_name}' not found in event_roi.json.")
 
-        x1, y1, x2, y2 = roi_data[event_class_name]["roi"]
-        frame_id = roi_data[event_class_name]["frame_id"]
+        x1, y1, x2, y2 = event_defs[event_class_name]["roi"]
+        frame_id = event_defs[event_class_name]["frame_id"]
         
         # Open video file and read the specified frame
         file_name = input("🎥 Enter extract file name (press Enter to use default): ").strip()
 
         if not file_name:
-            video_path = os.path.join("data", "events", "extracts", f"{event_class_name}_extract.mp4")
+            video_path = os.path.join(cst.EXTRACTS_DIR, f"{event_class_name}_extract.mp4")
         else:
-            video_path = os.path.join("data", "events", "extracts", f"{file_name}.mp4")
+            video_path = os.path.join(cst.EXTRACTS_DIR, f"{file_name}.mp4")
 
         cap = cv2.VideoCapture(video_path)
 
         if not cap.isOpened():
-            raise FileNotFoundError(f"Cannot open video file: {video_path}")
+            raise FileNotFoundError(f"❌ Cannot open video file: {video_path}")
 
         # Read the frame
         cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id)
@@ -45,7 +44,7 @@ def cropper(match_fn_names):
         cap.release()
 
         if not ret:
-            raise ValueError(f"Could not read frame {frame_id} from {video_path}")
+            raise ValueError(f"❌ Could not read frame {frame_id} from {video_path}")
 
         # Prompt user for match function
         print("\n🔍 Choose a match function:")
@@ -72,9 +71,9 @@ def cropper(match_fn_names):
             raise ValueError(f"❌ Missing crop export details for function for function:{selected_fn}")
 
         if is_template:
-            save_dir = os.path.join("data", "events", "templates")
+            save_dir = cst.TEMPLATES_DIR
         else:
-            save_dir = os.path.join("data", "events", "crop")
+            save_dir = cst.CROPS_DIR
 
         # Convert to grayscale if needed
         if is_gray:
@@ -84,11 +83,10 @@ def cropper(match_fn_names):
         # Crop
         cropped = frame[y1:y2, x1:x2]
 
+        event_defs[event_class_name]["match"] = selected_fn
+        
         # Save selected match function in the event JSON
-        roi_data[event_class_name]["match"] = selected_fn
-        with open(roi_path, "w") as f:
-            json.dump(roi_data, f, indent=2)
-        print(f"💾 Match function '{selected_fn}' saved to event '{event_class_name}' in events.json.")
+        js.update(cst.EVENTS_JSON_PATH, event_defs)
 
         # Save cropped image
         output_path = os.path.join(save_dir, f"{event_class_name}_{'template' if is_template else 'crop'}.png")
