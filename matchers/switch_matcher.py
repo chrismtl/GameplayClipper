@@ -61,7 +61,7 @@ def match_switch(frame_crop, glob_event_name, video_file_name, threshold=0.95):
     if matched:
         if len(matched)!=1: raise ValueError(f"❌ Cross match for '{event_name}':{[name for _,name in matched]}")
     
-        save_match_log(frame_crop, event_name, video_file_name)
+        save_match_log(frame_crop, event_name, video_file_name, matched[0][0])
         increment_match_template_id()
 
     # Debug

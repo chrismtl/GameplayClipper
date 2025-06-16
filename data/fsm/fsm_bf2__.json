@@ -1,0 +1,4 @@
+{
+  "start": ["kill_brc"],
+  "kill_brc": ["kill_brc"]
+}

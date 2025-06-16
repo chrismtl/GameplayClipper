@@ -38,16 +38,18 @@ def match_template_mask(frame_crop, glob_event_name, video_file_name, threshold=
 
     # Apply the mask to both template and frame_crop
     mask_bool = mask > 0
-    diff = (frame_crop.astype(np.float32) - template.astype(np.float32)) ** 2
+    # diff = (frame_crop.astype(np.float32) - template.astype(np.float32)) ** 2
+    diff = np.abs(frame_crop.astype(np.float32) - template.astype(np.float32))
     mask_3ch = np.repeat(mask_bool[:, :, None], 3, axis=2)
-    mse = np.sum(diff[mask_3ch]) / (np.count_nonzero(mask_bool) * 3)
+    # mse = np.sum(diff[mask_3ch]) / (np.count_nonzero(mask_bool) * 3)
+    mae = np.sum(diff[mask_3ch]) / (np.count_nonzero(mask_bool) * 3)
 
-    score = 1.0 - (mse / (255.0**2))
+    score = 1.0 - (mae / (255.0**2))
     matched = score >= threshold
 
     # Save only if match is successful
     if matched:
-        save_match_log(frame_crop, event_name, video_file_name)
+        save_match_log(frame_crop, event_name, video_file_name, score)
         increment_match_template_id()        
 
     return matched, score, event_name
@@ -96,7 +98,7 @@ def match_template_gray_no_mask(frame_crop, glob_event_name, video_file_name, th
     matched = score >= threshold
 
     if matched:
-        save_match_log(frame_crop, event_name, video_file_name)
+        save_match_log(frame_crop, event_name, video_file_name, score)
         increment_match_template_id()
 
     return matched, score, event_name
