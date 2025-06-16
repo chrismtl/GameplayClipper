@@ -187,7 +187,10 @@
       97
     ],
     "frame_id": 2023,
-    "match": "fixtemplate_gray"
+    "match": "fixtemplate_gray",
+    "cooldown": 15,
+    "trigger_interval": 5,
+    "threshold": 0.98
   },
   "bf2_respawn": {
     "roi": [
@@ -208,6 +211,18 @@
     ],
     "frame_id": 25022,
     "match": "fixtemplate_gray",
-    "trigger_interval": 50
+    "trigger_interval": 50,
+    "threshold": 0.95
+  },
+  "bf2_scoreboard": {
+    "roi": [
+      162,
+      911,
+      308,
+      935
+    ],
+    "frame_id": 2710,
+    "match": "fixtemplate_rgb",
+    "threshold": 0.99
   }
 }

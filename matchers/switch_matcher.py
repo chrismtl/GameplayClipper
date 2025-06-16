@@ -65,7 +65,7 @@ def match_switch(frame_crop, glob_event_name, video_file_name, threshold=0.95):
         increment_match_template_id()
 
     # Debug
-    if matched: print(f"🔍 Switch match results for '{event_name}': {matched}")
+    # if matched: print(f"🔍 Switch match results for '{event_name}': {matched}")
     final_score = matched[0][0] if matched else 0.0
     final_switch = matched[0][1] if matched else None
     

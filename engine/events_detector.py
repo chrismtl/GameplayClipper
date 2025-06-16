@@ -63,6 +63,8 @@ def detect_all_videos():
     for video_path in glob.glob(os.path.join(cst.RAW_VIDEO_DIR, "*.mp4")):
         print(f"🎞 Processing {os.path.basename(video_path)}...")
         game_name, first_frame = detect_game_from_video(video_path)
+        if game_name==None:
+            raise ValueError(f"❌ All file should have game splash within the first {cst.GAME_EVENT_MIN} frame for automatic detection")
         fsm_dict = load_fsm_for_game(game_name, event_defs)
         event_df = detect_events(game_name, video_path, event_defs, fsm_dict, first_frame)
         all_events.append(event_df)
@@ -86,6 +88,11 @@ def detect_single_video():
 
     print(f"🔍 Detecting events in {filename}...\n")
     game_name, first_frame = detect_game_from_video(path)
+    if game_name==None:
+        game_name = input("Could not detect game, please provide it: ")
+        first_frame_input = input("First frame:").strip()
+        first_frame =int(first_frame_input) if first_frame_input else cst.GAME_EVENT_MIN
+        
     fsm_dict = load_fsm_for_game(game_name, event_defs)
     events_df = detect_events(game_name, path, event_defs, fsm_dict, first_frame)
     if not events_df.empty:
@@ -152,7 +159,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
         for event_name in allowed_events:
             data = events_cache[event_name]
             trigger_interval = data.get("trigger_interval",0)
-            fcooldown = data.get("fcooldown",0)
+            fcooldown = data.get("fcooldown",cst.DEFAULT_EVENT_COOLDOWN)
             
             since_last = fsincelast[event_name]
 
@@ -176,7 +183,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
             matched, score, final_event_name = match_fn(frame_crop, glob_event_name, video_file_name, threshold)
             
             if matched:
-                print(f"✅ Detected {final_event_name} at {timestamp} with score {score:.2f}")
+                print(f"✅ Detected {final_event_name:<{cst.MAX_EVENT_NAME_LEN}} at {timestamp} with score {score:.2f}")
                 fsincelast[event_name] = 0
                 current_state = event_name
                 all_events.append({

@@ -25,6 +25,9 @@ def roi_selector_gui(video_path: str, event_name: str, initial_frame_index: int 
         elif event == cv2.EVENT_LBUTTONUP:
             if click_start[0] is not None:
                 x1, y1 = click_start[0]
+                # Adjust rectangle pixel mistake
+                x1+=1
+                y1+=1
                 x2, y2 = x, y
                 if zoom_roi[0]:
                     zx1, zy1, _, _ = zoom_roi[0]
