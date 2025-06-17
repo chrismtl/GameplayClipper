@@ -22,7 +22,7 @@ def cropper(match_fn_names):
         print("❌ Invalid event name...")
     
     # Refresh json cache
-    events_json_path = os.path.join("data",game_name,"events.json")
+    events_json_path = os.path.join("data",game_name,f"{game_name}_events.json")
     js.refresh(events_json_path)
     
     # Load ROI

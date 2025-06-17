@@ -24,7 +24,7 @@ def match_switch(frame_crop, glob_event_name, video_file_name, threshold=0.95):
     game_name, event_name = glob_event_name.split("_", 1)
     
     # Load event definition
-    event_defs = js.load(os.path.join("data",game_name,"events.json"))
+    event_defs = js.load(os.path.join("data",game_name,f"{game_name}_events.json"))
 
     event_info = event_defs.get(glob_event_name, {})
     switches = event_info.get("switches", [])

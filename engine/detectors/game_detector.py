@@ -26,10 +26,11 @@ def detect_game_from_video(video_path):
         starter_path = os.path.join(game_folder, "starter.json")
 
         starter_list = js.load(starter_path)
-        event_path = os.path.join(game_folder, "events.json")
+        event_path = os.path.join(game_folder, f"{game_name}_events.json")
 
         event_defs = js.load(event_path)
         for event_name in starter_list:
+            event_name = f"{game_name}_{event_name}"
             if event_name in event_defs:
                 starter_events[event_name] = event_defs[event_name]
             else:

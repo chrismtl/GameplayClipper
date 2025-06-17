@@ -154,7 +154,7 @@ def roi_selector_gui(video_path: str,
 
 def save_event_data(game_name, event_name: str, roi: tuple, frame_id: int):
     # Load existing data
-    event_json_path = os.path.join("data",game_name,"events.json")
+    event_json_path = os.path.join("data",game_name,f"{game_name}_events.json")
     if os.path.exists(event_json_path):
         event_defs = js.load(event_json_path)
     else:

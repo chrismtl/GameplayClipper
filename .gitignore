@@ -1,4 +1,5 @@
 data/*/assets/extracts
+generated/logs
 media
 
 **/__pycache__/

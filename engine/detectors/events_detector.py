@@ -32,7 +32,7 @@ def load_fsm_for_game(game_name, event_defs):
     fsm_dict = js.load(fsm_file)
 
     known_events = set(event_defs.keys())
-
+    
     for state, transitions in fsm_dict.items():
         # Skip validation for pseudo-state 'start'
         if state == "start":
@@ -66,7 +66,7 @@ def detect_all_videos():
         if game_name==None:
             print(f"❌ Skipping detection for {filename}: could not detect game")
         
-        event_path = os.path.join("data", game_name, f"fsm_{game_name}.json")
+        event_path = os.path.join("data", game_name, f"{game_name}_events.json")
         event_defs = js.load(event_path)
         
         fsm_dict = load_fsm_for_game(game_name, event_defs)
