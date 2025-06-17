@@ -1,10 +1,10 @@
 import cv2
 import utils.time_utils as time_utils
 
-def iterate_video(path):
+def iterate_video(path, frame_rate=None):
     cap = cv2.VideoCapture(path)
     fps = int(cap.get(cv2.CAP_PROP_FPS))
-    step = 1
+    step = 1 if frame_rate is None else max(1, int(fps // frame_rate))
 
     frame_id = 0
 

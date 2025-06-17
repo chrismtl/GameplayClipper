@@ -1,16 +1,21 @@
 import os
 import cv2
 import utils.image_cacher as imgc
-import data.constants as cst
+import utils.constants as cst
 
 def create_template():
     print("\n🛠️ Template Creator")
-    event_class = input("Enter event class name (e.g. kill): ").strip()
-
+    while True:
+        event_name = input("Enter event name (e.g. kill): ").strip()
+        parts = event_name.split("_", 1)
+        if len(parts)==2:
+            game_name, _ = parts
+            break
+        print("❌ Invalid event name...")
     try:
         # Define paths
-        crop_path = os.path.join(cst.CROPS_DIR, f"{event_class}_crop.png")
-        mask_path = os.path.join(cst.MASKS_DIR, f"{event_class}_mask.png")
+        crop_path = os.path.join("data", game_name, cst.CROPS_DIR, f"{event_name}_crop.png")
+        mask_path = os.path.join("data", game_name, cst.MASKS_DIR, f"{event_name}_mask.png")
 
         # Load crop (in color) and mask (in grayscale)
         crop = imgc.load(crop_path, cv2.IMREAD_COLOR)
@@ -36,7 +41,7 @@ def create_template():
         cv2.destroyAllWindows()
 
         # Save result
-        output_path = os.path.join(cst.TEMPLATES_UNIQUE_DIR, f"{event_class}_template.png")
+        output_path = os.path.join("data", game_name, cst.TEMPLATES_UNIQUE_DIR, f"{event_name}_template.png")
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         cv2.imwrite(output_path, template)
         print(f"✅ Template saved to: {output_path}")

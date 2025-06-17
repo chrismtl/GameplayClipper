@@ -52,4 +52,4 @@ while frame_count < frame_limit:
 
 cap.release()
 out.release()
-print(f"✅ Trimmed clip saved to {OUTPUT_PATH}")
+print(f"✅ Trimmed clip saved to {output_path}")

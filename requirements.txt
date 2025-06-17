@@ -1,9 +1,10 @@
-# Image processing
+os
+time
+glob
+shutil
 opencv-contrib-python
-
-# Data handling
+json
 pandas
 numpy
+matplotlib
 
-# Utility libraries
-tqdm        # For progress bars

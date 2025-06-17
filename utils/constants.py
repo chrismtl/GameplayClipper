@@ -23,27 +23,18 @@ FULL_GAME_NAME = {
 }
 
 # =============== PATHS ===============
-# Folder paths
-CROPS_DIR =     os.path.join("data", "events", "crops")
-EXTRACTS_DIR =  os.path.join("data", "events", "extracts")
-MASKS_DIR =     os.path.join("data", "events", "masks")
+LOGS_DIR = os.path.join("generated", "logs")
 
-TEMPLATES_UNIQUE_DIR = os.path.join("data", "events", "templates", "unique")
-TEMPLATES_SWITCH_DIR = os.path.join("data", "events", "templates", "switch")
+MEDIA_DIR = "media"
 
-FSM_DIR =       os.path.join("data", "fsm")
+OUT_DF_DIR = os.path.join("generated","dataframes")
 
-LOGS_DIR =      os.path.join("data", "logs")
+CLIPS_DIR = os.path.join("generated","clips")
 
-RAW_VIDEO_DIR = os.path.join("data","raw_videos")
-
-OUT_DF_DIR =    os.path.join("data","out","dataframes")
-
-CLIPS_DIR =  os.path.join("data","out","clips")
-
-# File paths
-EVENTS_JSON_PATH = os.path.join("data","events","events.json")
-
+CROPS_DIR = os.path.join("assets","crops")
+TEMPLATES_SWITCH_DIR = os.path.join("assets","templates","switch")
+TEMPLATES_UNIQUE_DIR = os.path.join("assets","templates","unique")
+MASKS_DIR = os.path.join("assets","masks")
 
 """
 Which custom extract file for which event

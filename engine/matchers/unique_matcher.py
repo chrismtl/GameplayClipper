@@ -2,8 +2,8 @@ import os
 import cv2
 import numpy as np
 import utils.image_cacher as imgc
-from matchers.match_utils import increment_match_template_id, save_match_log
-import data.constants as cst
+from engine.matchers.match_utils import increment_match_template_id, save_match_log
+import utils.constants as cst
 
 def match_template_mask(frame_crop, glob_event_name, video_file_name, threshold=0.95):
     """
@@ -19,11 +19,11 @@ def match_template_mask(frame_crop, glob_event_name, video_file_name, threshold=
         score (float): Similarity score.
     """
     # Get event name without the game prefix
-    event_name = glob_event_name.split("_", 1)[1]
+    game_name, event_name = glob_event_name.split("_", 1)
     
     # Load template and mask
-    template_path = os.path.join(cst.TEMPLATES_UNIQUE_DIR, f"{glob_event_name}_template.png")
-    mask_path = os.path.join(cst.MASKS_DIR, f"{glob_event_name}_mask.png")
+    template_path = os.path.join("data",game_name,cst.TEMPLATES_UNIQUE_DIR, f"{glob_event_name}_template.png")
+    mask_path = os.path.join("data",game_name,cst.MASKS_DIR, f"{glob_event_name}_mask.png")
 
     # Load as color
     template = imgc.load(template_path, cv2.IMREAD_COLOR)
@@ -70,10 +70,10 @@ def match_template_gray_no_mask(frame_crop, glob_event_name, video_file_name, th
         event_name (str): Same as input.
     """
     # Get event name without the game prefix
-    event_name = glob_event_name.split("_", 1)[1]
+    game_name, event_name = glob_event_name.split("_", 1)
     
     # Load template
-    template_path = os.path.join(cst.TEMPLATES_UNIQUE_DIR, f"{glob_event_name}_template.png")
+    template_path = os.path.join("data",game_name,cst.TEMPLATES_UNIQUE_DIR, f"{glob_event_name}_template.png")
     template_gray = imgc.load(template_path, cv2.IMREAD_GRAYSCALE)
 
     if template_gray is None:

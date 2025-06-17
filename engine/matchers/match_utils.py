@@ -1,6 +1,6 @@
 import os
 import cv2
-import data.constants as cst
+import utils.constants as cst
 
 # Match template ID for logging
 match_template_id = 1

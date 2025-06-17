@@ -1,7 +1,7 @@
 import os
 import cv2
 import utils.json_cacher as js
-import data.constants as cst
+import utils.constants as cst
 
 def cropper(match_fn_names):
     """
@@ -12,17 +12,24 @@ def cropper(match_fn_names):
         video_file_stem (str): Video file name without extension (e.g., "kill_extract"), located in data/raw_videos/.
         frame_id (int): Frame index to extract from.
     """
-    # Refresh json cache
-    js.refresh(cst.EVENTS_JSON_PATH)
-    
     # Read inputs
-    event_class_name = input("Enter event name (e.g. kill): ").strip()
+    while True:
+        event_class_name = input("Enter event name (e.g. kill): ").strip()
+        parts = event_class_name.split("_", 1)
+        if len(parts)==2:
+            game_name, _ = parts
+            break
+        print("❌ Invalid event name...")
+    
+    # Refresh json cache
+    events_json_path = os.path.join("data",game_name,"events.json")
+    js.refresh(events_json_path)
     
     # Load ROI
-    event_defs = js.load(cst.EVENTS_JSON_PATH)
+    event_defs = js.load(events_json_path)
 
     if event_class_name not in event_defs:
-        raise ValueError(f"Event class '{event_class_name}' not found in event_roi.json.")
+        raise ValueError(f"❌ Event class '{event_class_name}' not found in events.json.")
 
     x1, y1, x2, y2 = event_defs[event_class_name]["roi"]
     frame_id = event_defs[event_class_name]["frame_id"]
@@ -30,10 +37,11 @@ def cropper(match_fn_names):
     # Open video file and read the specified frame
     file_name = input("🎥 Enter extract file name (press Enter to use default): ").strip()
 
+    extracts_dir = os.path.join("data",game_name,"assets","extracts")
     if not file_name:
-        video_path = os.path.join(cst.EXTRACTS_DIR, f"{event_class_name}_extract.mp4")
+        video_path = os.path.join(extracts_dir, f"{event_class_name}_extract.mp4")
     else:
-        video_path = os.path.join(cst.EXTRACTS_DIR, f"{file_name}.mp4")
+        video_path = os.path.join(extracts_dir, f"{file_name}.mp4")
 
     cap = cv2.VideoCapture(video_path)
 
@@ -61,29 +69,31 @@ def cropper(match_fn_names):
         print("❌ Invalid selection. Try again.")
 
     # Determine mode and path
-    is_template = False
+    is_unique = False
     is_gray = False
     is_switch = False
     
     if selected_fn == "fixtemplate_rgb":
         pass
     elif selected_fn == "fixtemplate_gray":
-        is_template = True
+        is_unique = True
         is_gray = True
         is_switch = False
     elif selected_fn == "switch":
-        is_template = False
+        is_unique = False
         is_gray = True
         is_switch = True
     else:
         raise ValueError(f"❌ Missing crop export details for function for function:{selected_fn}")
 
-    if is_template:
-        save_dir = cst.TEMPLATES_UNIQUE_DIR
+    templates_dir = os.path.join("data",game_name,cst.TEMPLATES_UNIQUE_DIR)
+    crops_dir = os.path.join("data",game_name,cst.CROPS_DIR)
+    if is_unique:
+        pass
     elif is_switch:
-        save_dir = os.path.join(cst.TEMPLATES_SWITCH_DIR,event_class_name)
+        templates_dir = os.path.join("data",game_name,cst.TEMPLATES_SWITCH_DIR,event_class_name)
     else:
-        save_dir = cst.CROPS_DIR
+        templates_dir = crops_dir
 
     # Convert to grayscale if needed
     if is_gray:
@@ -95,18 +105,18 @@ def cropper(match_fn_names):
 
     event_defs[event_class_name]["match"] = selected_fn
     # Save selected match function in the event JSON
-    js.update(cst.EVENTS_JSON_PATH, event_defs)
+    js.update(events_json_path, event_defs)
 
     # Save cropped image
-    if is_template:
+    if is_unique:
         filename = f"{event_class_name}_template"
     elif is_switch:
         filename = f"{frame_id}_template"
     else:
         filename = f"{event_class_name}_crop"
         
-    output_path = os.path.join(save_dir, f"{filename}.png")
-    os.makedirs(save_dir, exist_ok=True)
+    output_path = os.path.join(templates_dir, f"{filename}.png")
+    os.makedirs(templates_dir, exist_ok=True)
     cv2.imwrite(output_path, cropped)
 
     input(f"✅ Cropped image saved to: {output_path} ! Press Enter to continue...")

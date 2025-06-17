@@ -1,9 +1,9 @@
 import os
 import cv2
-from matchers.match_utils import increment_match_template_id, save_match_log
+from engine.matchers.match_utils import increment_match_template_id, save_match_log
 import utils.image_cacher as imgc
 import utils.json_cacher as js
-import data.constants as cst
+import utils.constants as cst
 
 def match_switch(frame_crop, glob_event_name, video_file_name, threshold=0.95):
     """
@@ -21,10 +21,10 @@ def match_switch(frame_crop, glob_event_name, video_file_name, threshold=0.95):
         event_name (str): Name of the best-matching switch.
     """
     # Get event name without the game prefix
-    event_name = glob_event_name.split("_", 1)[1]
+    game_name, event_name = glob_event_name.split("_", 1)
     
     # Load event definition
-    event_defs = js.load(cst.EVENTS_JSON_PATH)
+    event_defs = js.load(os.path.join("data",game_name,"events.json"))
 
     event_info = event_defs.get(glob_event_name, {})
     switches = event_info.get("switches", [])
@@ -42,7 +42,7 @@ def match_switch(frame_crop, glob_event_name, video_file_name, threshold=0.95):
     frame_gray = cv2.cvtColor(frame_crop, cv2.COLOR_BGR2GRAY)
 
     for switch in switches:
-        template_path = os.path.join(cst.TEMPLATES_SWITCH_DIR, glob_event_name, f"{switch}_template.png")
+        template_path = os.path.join("data",game_name,cst.TEMPLATES_SWITCH_DIR, glob_event_name, f"{switch}_template.png")
         template_gray = imgc.load(template_path, cv2.IMREAD_GRAYSCALE)
 
         if template_gray is None:

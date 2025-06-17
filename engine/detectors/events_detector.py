@@ -3,12 +3,12 @@ import time
 import glob
 import shutil
 import pandas as pd
-from engine.game_detector import detect_game_from_video
-from matchers.matcher_registry import MATCH_FUNCTIONS
-from matchers.match_utils import reset_match_template_id
+from engine.detectors.game_detector import detect_game_from_video
+from engine.matchers.matcher_registry import MATCH_FUNCTIONS
+from engine.matchers.match_utils import reset_match_template_id
 from tools.frame_extractor import iterate_video
 import utils.json_cacher as js
-import data.constants as cst
+import utils.constants as cst
 
 def load_fsm_for_game(game_name, event_defs):
     """
@@ -25,7 +25,7 @@ def load_fsm_for_game(game_name, event_defs):
         FileNotFoundError: If the FSM file does not exist.
         ValueError: If the FSM refers to unknown states or events (excluding 'start').
     """
-    fsm_file = os.path.join(cst.FSM_DIR, f"fsm_{game_name}.json")
+    fsm_file = os.path.join("data", game_name, f"fsm_{game_name}.json")
     if not os.path.exists(fsm_file):
         raise FileNotFoundError(f"❌ FSM file not found for game '{game_name}' at {fsm_file}")
 
@@ -56,20 +56,23 @@ def load_fsm_for_game(game_name, event_defs):
 
 def detect_all_videos():
     print("🔍 Detecting events in all videos...\n")
-
-    event_defs = js.load(cst.EVENTS_JSON_PATH)
-
+    
     all_events = []
-    for video_path in glob.glob(os.path.join(cst.RAW_VIDEO_DIR, "*.mp4")):
-        print(f"🎞 Processing {os.path.basename(video_path)}...")
+    for video_path in glob.glob(os.path.join(cst.MEDIA_DIR, "*.mp4")):
+        filename = os.path.splitext(os.path.basename(video_path))[0]
+        print(f"🎞 Processing {filename}...")
+        
         game_name, first_frame = detect_game_from_video(video_path)
         if game_name==None:
-            raise ValueError(f"❌ All file should have game splash within the first {cst.GAME_EVENT_MIN} frame for automatic detection")
+            print(f"❌ Skipping detection for {filename}: could not detect game")
+        
+        event_path = os.path.join("data", game_name, f"fsm_{game_name}.json")
+        event_defs = js.load(event_path)
+        
         fsm_dict = load_fsm_for_game(game_name, event_defs)
         event_df = detect_events(game_name, video_path, event_defs, fsm_dict, first_frame)
         all_events.append(event_df)
 
-        filename = os.path.splitext(os.path.basename(video_path))[0]
         save_events_to_csv(event_df, filename)
 
     if not all_events:
@@ -78,13 +81,11 @@ def detect_all_videos():
 
 def detect_single_video():
     filename = input("Enter mp4 video file name (e.g. recording_1): ").strip()
-    path = os.path.join(cst.RAW_VIDEO_DIR, filename + ".mp4")
+    path = os.path.join(cst.MEDIA_DIR, filename + ".mp4")
 
     if not os.path.exists(path):
         print(f"❌ File not found: {path}")
         return
-
-    event_defs = js.load(cst.EVENTS_JSON_PATH)
 
     print(f"🔍 Detecting events in {filename}...\n")
     game_name, first_frame = detect_game_from_video(path)
@@ -92,6 +93,9 @@ def detect_single_video():
         game_name = input("Could not detect game, please provide it: ")
         first_frame_input = input("First frame:").strip()
         first_frame =int(first_frame_input) if first_frame_input else cst.GAME_EVENT_MIN
+    
+    event_path = os.path.join("data", game_name, f"fsm_{game_name}.json")
+    event_defs = js.load(event_path)
         
     fsm_dict = load_fsm_for_game(game_name, event_defs)
     events_df = detect_events(game_name, path, event_defs, fsm_dict, first_frame)

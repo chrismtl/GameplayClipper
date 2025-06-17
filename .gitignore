@@ -1,7 +1,5 @@
-data/raw_videos
-data/events/extracts
-data/logs
-data/saves
+data/*/assets/extracts
+media
 
 **/__pycache__/
 *.py[cod]

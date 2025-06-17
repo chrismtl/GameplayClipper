@@ -1,8 +1,14 @@
 import os
 import pandas as pd
-import data.constants as cst
+import utils.constants as cst
 from tools.clip_extractor import extract_clips
-from llm.query_translator import translate_query
+
+
+def translate_query(user_text):
+    user_text = user_text.lower()
+    if "kill" in user_text:
+        return {"filter": {"event": "kill"}}
+    return {"filter": {"event": "unknown"}}
 
 def query():
     if not os.path.exists(cst.OUT_DF_DIR):
@@ -36,7 +42,7 @@ def query():
     os.makedirs(cst.CLIPS_DIR, exist_ok=True)
 
     for i, row in filtered.iterrows():
-        video_file = os.path.join(cst.RAW_VIDEO_DIR, row["video"])
+        video_file = os.path.join(cst.MEDIA_DIR, row["video"])
         clip_path = os.path.join(cst.CLIPS_DIR, f"clip_{i}.mp4")
         extract_clips(pd.DataFrame([row]), video_file, clip_path, duration=cst.CLIP_DURATION)
 

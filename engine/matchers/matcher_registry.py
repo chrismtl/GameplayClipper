@@ -1,5 +1,5 @@
-import matchers.unique_matcher as um
-import matchers.switch_matcher as sm
+import engine.matchers.unique_matcher as um
+import engine.matchers.switch_matcher as sm
  
 MATCH_FUNCTIONS = {
     "fixtemplate_rgb": um.match_template_mask,

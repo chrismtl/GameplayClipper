@@ -1,7 +1,7 @@
 import os
-from engine.events_detector import detect_all_videos, detect_single_video
-from engine.query_extractor import query
-from matchers.matcher_registry import get_match_functions_name
+from engine.detectors.events_detector import detect_all_videos, detect_single_video
+from engine.translators.query_extractor import query
+from engine.matchers.matcher_registry import get_match_functions_name
 from tools.roi_selector import roi_selector
 from tools.cropper import cropper
 from tools.template_creator import create_template

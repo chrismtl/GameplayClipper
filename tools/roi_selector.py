@@ -1,9 +1,12 @@
 import os
 import cv2
 import utils.json_cacher as js
-import data.constants as cst
 
-def roi_selector_gui(video_path: str, event_name: str, initial_frame_index: int = 0, draw_roi: tuple[int, int, int, int] = None):
+def roi_selector_gui(video_path: str,
+                     game_name: str,
+                     event_name: str,
+                     initial_frame_index: int = 0,
+                     draw_roi: tuple[int, int, int, int] = None):
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise IOError(f"❌ Cannot open video: {video_path}")
@@ -143,18 +146,19 @@ def roi_selector_gui(video_path: str, event_name: str, initial_frame_index: int 
 
         confirm = input(f"\n💾 Save this ROI as '{event_name}'? [y/N]: ").strip().lower()
         if confirm == "y":
-            save_event_data(event_name, roi[0], frame_index[0])
+            save_event_data(game_name, event_name, roi[0], frame_index[0])
         else:
             print("❌ Save aborted.")
     else:
         print("⚠️ No ROI selected.")
 
-def save_event_data(event_name: str, roi: tuple, frame_id: int):
+def save_event_data(game_name, event_name: str, roi: tuple, frame_id: int):
     # Load existing data
-    if os.path.exists(cst.EVENTS_JSON_PATH):
-        event_defs = js.load(cst.EVENTS_JSON_PATH)
+    event_json_path = os.path.join("data",game_name,"events.json")
+    if os.path.exists(event_json_path):
+        event_defs = js.load(event_json_path)
     else:
-        raise ValueError("⚠️ cst.EVENTS_JSON_PATH does not exist.")
+        raise ValueError(f"⚠️ {event_json_path} does not exist.")
 
     if event_name not in event_defs:
         event_defs[event_name] = {}
@@ -164,12 +168,18 @@ def save_event_data(event_name: str, roi: tuple, frame_id: int):
         "frame_id": frame_id
     })
     
-    js.update(cst.EVENTS_JSON_PATH, event_defs)
+    js.update(event_json_path, event_defs)
     
     print("✅ New event created in events.json.")
 
 def roi_selector():
-    event_name = input("🏷️  Enter new event name: ").strip()
+    while True:
+        new_event_name = input("🏷️  Enter new event name: ").strip()
+        parts = new_event_name.split("_", 1)
+        if len(parts)==2:
+            game_name, event_name = parts
+            break
+        print("❌ Invalid event name...")
     file_name = input("🎥 Enter extract filename (press Enter to use default): ").strip()
 
     if not file_name:
@@ -182,6 +192,6 @@ def roi_selector():
         input(f"❌ File not found: {full_path}")
         return
 
-    roi_selector_gui(full_path, event_name)
+    roi_selector_gui(full_path, game_name, event_name)
     input("Press Enter to continue...")
 
