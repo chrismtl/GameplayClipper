@@ -7,7 +7,7 @@ INIT_COOLDOWN_VALUE = 9999  # Initial cooldown value for events
 CLIP_DURATION = 10  # seconds
 GAME_SEARCH_FRAME_STEP = 30  # Search every 30 frames
 
-CONFIDENCE_PRECISION = 3  # Decimal places for confidence scores
+CONFIDENCE_PRECISION = 4  # Decimal places for confidence scores
 
 GAME_EVENT_MIN = 30*60
 

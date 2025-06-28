@@ -63,7 +63,8 @@
     ],
     "frame_id": 4330,
     "match": "fixtemplate_rgb",
-    "threshold": 0.99
+    "threshold": 0.99,
+    "min_frames": 10
   },
   "bf2_class": {
     "roi": [
@@ -119,7 +120,7 @@
     ],
     "frame_id": 2690,
     "match": "fixtemplate_rgb",
-    "threshold": 0.993,
+    "threshold": 0.97,
     "fcooldown": 1
   },
   "bf2_death": {
@@ -223,6 +224,6 @@
     ],
     "frame_id": 2710,
     "match": "fixtemplate_rgb",
-    "threshold": 0.99
+    "threshold": 0.999
   }
 }

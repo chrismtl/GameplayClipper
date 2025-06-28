@@ -13,14 +13,14 @@
     "kill_sgt":     ["fsm_alive", "scoreboard"],
 
     "scoreboard":   ["loadout", "podium", "fsm_alive"],
-    "game_menu":    ["spawn_troop", "podium", "main_menu"],
+    "game_menu":    ["loadout", "podium", "main_menu"],
     "respawn":      ["spawn_troop", "podium", "main_menu"],
     
     "vaincu":       ["loadout", "win", "defeat"],
     "death":        ["loadout", "win", "defeat"],
 
-    "win":          ["podium"],
-    "defeat":       ["podium"],
+    "win":          ["podium", "scoreboard"],
+    "defeat":       ["podium", "scoreboard"],
 
     "podium":       ["match_end"],
     "match_end":    ["main_menu","loadout"]

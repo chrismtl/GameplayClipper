@@ -94,9 +94,9 @@ def detect_single_video():
         first_frame_input = input("First frame:").strip()
         first_frame =int(first_frame_input) if first_frame_input else cst.GAME_EVENT_MIN
     
-    event_path = os.path.join("data", game_name, f"fsm_{game_name}.json")
+    event_path = os.path.join("data", game_name, f"{game_name}_events.json")
     event_defs = js.load(event_path)
-        
+    
     fsm_dict = load_fsm_for_game(game_name, event_defs)
     events_df = detect_events(game_name, path, event_defs, fsm_dict, first_frame)
     if not events_df.empty:
@@ -131,9 +131,14 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
         if name.startswith(prefix)
     }
     
-    event_list = list(filtered_event_defs.keys())
-    fsincelast = {event: cst.INIT_COOLDOWN_VALUE for event in event_list}
-    
+    fsincelast = {}
+    has_min_frames = set()
+
+    for event, data in filtered_event_defs.items(): 
+        fsincelast[event] = data.get("min_frames", cst.INIT_COOLDOWN_VALUE)
+        if "min_frames" in data:
+            has_min_frames.add(event)
+
     # Cache relevant event data
     events_cache = {
         name: {
@@ -167,9 +172,11 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
             
             since_last = fsincelast[event_name]
 
+            # Trigger interval logic
             if trigger_interval and frame_id%trigger_interval:
                 continue
             
+            # Cooldown logic
             elif fcooldown and since_last < fcooldown:
                 fsincelast[event_name] = since_last + 1
                 continue
@@ -185,6 +192,16 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
             frame_crop = frame[y1:y2, x1:x2]
             glob_event_name = f"{game_name}_{event_name}"
             matched, score, final_event_name = match_fn(frame_crop, glob_event_name, video_file_name, threshold)
+            
+            # Min frames logic
+            if event_name in has_min_frames:
+                if matched:
+                    fsincelast[event_name] += 1
+                else:
+                    fsincelast[event_name] = 0
+                
+                if fsincelast[event_name] < filtered_event_defs[event_name]["min_frames"]:
+                    continue
             
             if matched:
                 print(f"✅ Detected {final_event_name:<{cst.MAX_EVENT_NAME_LEN}} at {timestamp} with score {score:.2f}")

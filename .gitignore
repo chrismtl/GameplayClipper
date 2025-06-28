@@ -1,6 +1,7 @@
 data/*/assets/extracts
 generated/logs
 media
+testing
 
 **/__pycache__/
 *.py[cod]
