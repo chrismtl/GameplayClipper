@@ -183,7 +183,7 @@ def roi_selector():
     file_name = input("🎥 Enter extract filename (press Enter to use default): ").strip()
 
     if not file_name:
-        full_path = f"data/events/extracts/{event_name}_extract.mp4"
+        full_path = f"data/events/extracts/{parts}_extract.mp4"
     else:
         full_path = f"data/events/extracts/{file_name}.mp4"
 

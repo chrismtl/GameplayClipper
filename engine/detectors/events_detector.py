@@ -6,6 +6,7 @@ import pandas as pd
 from engine.detectors.game_detector import detect_game_from_video
 from engine.matchers.matcher_registry import MATCH_FUNCTIONS
 from engine.matchers.match_utils import reset_match_template_id
+from engine.processors.game_stats import extract_game_stats
 from tools.frame_extractor import iterate_video
 import utils.json_cacher as js
 import utils.constants as cst
@@ -215,7 +216,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
                     "video": video_file_name
                 })
     
-    reset_match_template_id()  # Reset global counter after processing
+    reset_match_template_id()
     end_time = time.time()
     print(f"⏱️  Runtime for {video_file_name}: {end_time - start_time:.3f} seconds")
     return pd.DataFrame(all_events)

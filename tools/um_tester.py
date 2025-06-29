@@ -1,6 +1,6 @@
 import os
 import cv2
-from engine.matchers.unique_matcher import match_template_mask
+from ..engine.matchers.unique_matcher import match_template_mask
 
 mode = 1
 
