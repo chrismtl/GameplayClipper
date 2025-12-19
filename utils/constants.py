@@ -9,7 +9,7 @@ GAME_SEARCH_FRAME_STEP = 30  # Search every 30 frames
 
 CONFIDENCE_PRECISION = 4  # Decimal places for confidence scores
 
-GAME_EVENT_MIN = 30*60
+GAME_EVENT_MIN = 10*60*30
 
 MAX_EVENT_NAME_LEN = 12
 

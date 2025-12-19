@@ -13,7 +13,7 @@
     "kill_sgt":     ["fsm_alive", "scoreboard"],
 
     "scoreboard":   ["loadout", "podium", "fsm_alive"],
-    "game_menu":    ["loadout", "podium", "main_menu"],
+    "game_menu":    ["spawn_troop", "loadout", "podium", "main_menu"],
     "respawn":      ["spawn_troop", "podium", "main_menu"],
     
     "vaincu":       ["loadout", "win", "defeat"],

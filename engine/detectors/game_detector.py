@@ -42,7 +42,7 @@ def detect_game_from_video(video_path):
     detected_games = set()
     for frame_id, frame, _ in iterate_video(video_path, cst.GAME_SEARCH_FRAME_STEP):
         if frame_id > cst.GAME_EVENT_MIN:
-            print(f"❌ No game detected within the first {cst.GAME_EVENT_MIN/30} frames.")
+            print(f"❌ No game detected within the first {int(cst.GAME_EVENT_MIN/(30*60))} minutes.")
             return None, None
 
         for name, data in starter_events.items():
