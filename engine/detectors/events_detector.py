@@ -62,18 +62,8 @@ def detect_all_videos():
         filename = os.path.splitext(os.path.basename(video_path))[0]
         print(f"🎞 Processing {filename}...")
         
-        game_name, first_frame = detect_game_from_video(video_path)
-        if game_name==None:
-            continue
-        
-        event_path = os.path.join("data", game_name, f"{game_name}_events.json")
-        event_defs = js.load(event_path)
-        
-        fsm_dict = load_fsm_for_game(game_name, event_defs)
-        event_df = detect_events(game_name, video_path, event_defs, fsm_dict, first_frame)
-        all_events.append(event_df)
-
-        save_events_to_csv(event_df, filename)
+        df = detect_video(video_path)
+        all_events.append(df)
 
     if not all_events:
         print("⚠️ No events detected.")
@@ -88,17 +78,20 @@ def detect_single_video():
         return
 
     print(f"🔍 Detecting events in {filename}...\n")
-    game_name, first_frame = detect_game_from_video(path)
+    detect_video(path)
+
+
+def detect_video(video_path):
+    filename = os.path.splitext(os.path.basename(video_path))[0]
+    game_name, first_frame = detect_game_from_video(video_path)
     if game_name==None:
-        game_name = input("Could not detect game, please provide it: ")
-        first_frame_input = input("First frame:").strip()
-        first_frame =int(first_frame_input) if first_frame_input else cst.GAME_EVENT_MIN
+        print("❌ Game could not be detected for file:", video_path)
+        return None, None
     
     event_path = os.path.join("data", game_name, f"{game_name}_events.json")
     event_defs = js.load(event_path)
-    
     fsm_dict = load_fsm_for_game(game_name, event_defs)
-    events_df = detect_events(game_name, path, event_defs, fsm_dict, first_frame)
+    events_df = detect_events(game_name, video_path, event_defs, fsm_dict, first_frame)
     if not events_df.empty:
         print(f"✅ {len(events_df)} events detected.")
         save_events_to_csv(events_df, filename)
@@ -128,7 +121,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
     filtered_event_defs = {
         name[len(prefix):]: data
         for name, data in event_defs.items()
-        if name.startswith(prefix)
+        # if name.startswith(prefix)
     }
     
     fsincelast = {}
@@ -144,7 +137,7 @@ def detect_events(game_name, video_path, event_defs, fsm_dict, first_frame, firs
         name: {
             "roi": data["roi"],
             "match_fn": MATCH_FUNCTIONS.get(data["match"]),
-            "threshold": data.get("threshold", 0.9),
+            "threshold": data.get("threshold", cst.DEFAULT_EVENT_THRESHOLD),
             "trigger_interval": data.get("trigger_interval", 0),
             "fcooldown": data.get("fcooldown", 0)
         }

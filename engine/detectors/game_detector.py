@@ -4,7 +4,7 @@ from engine.matchers.matcher_registry import MATCH_FUNCTIONS
 from tools.frame_extractor import iterate_video
 import utils.json_cacher as js
 
-def detect_game_from_video(video_path):
+def  detect_game_from_video(video_path):
     """
     Detect the game from the video filename by searching for *_splash templates.
 
