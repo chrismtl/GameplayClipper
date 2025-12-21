@@ -4,14 +4,18 @@ from __future__ import annotations
 
 try:
     from PySide6.QtWidgets import QWidget, QVBoxLayout
-    from PySide6.QtCore import Qt
+    from PySide6.QtCore import Qt, Signal
 except ImportError:
     try:
         from PyQt6.QtWidgets import QWidget, QVBoxLayout
-        from PyQt6.QtCore import Qt
+        from PyQt6.QtCore import Qt, pyqtSignal
+
+        Signal = pyqtSignal
     except ImportError:
         from PyQt5.QtWidgets import QWidget, QVBoxLayout
-        from PyQt5.QtCore import Qt
+        from PyQt5.QtCore import Qt, pyqtSignal
+
+        Signal = pyqtSignal
 
 from gui.styles import theme
 from gui.widgets.buttons import primary_button
@@ -19,6 +23,8 @@ from gui.widgets.buttons import primary_button
 
 class HomePage(QWidget):
     """Landing page with primary action entry point."""
+
+    processRequested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -33,6 +39,7 @@ class HomePage(QWidget):
         layout.setAlignment(Qt.AlignCenter)
 
         process_btn = primary_button("Process")
+        process_btn.clicked.connect(self.processRequested.emit)
         layout.addWidget(process_btn, alignment=Qt.AlignCenter)
 
         self.setStyleSheet(

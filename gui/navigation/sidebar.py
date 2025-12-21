@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+HAMBURGER_ICON = "\u2261"  # Horizontal lines (≡)
+COLLAPSE_ICON = "\u276e"  # Stylized collapse arrow (❮)
+
 try:
     from PySide6.QtWidgets import (
         QWidget,
@@ -58,12 +61,12 @@ class SidebarPanel(QWidget):
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(12)
 
-        self.hamburger_btn = QPushButton("≡")
+        self.hamburger_btn = QPushButton(HAMBURGER_ICON)
         self.hamburger_btn.setObjectName("hamburger")
         self.hamburger_btn.setFixedSize(40, 32)
         self.hamburger_btn.clicked.connect(self.expand)
 
-        self.collapse_btn = QPushButton("❮")
+        self.collapse_btn = QPushButton(COLLAPSE_ICON)
         self.collapse_btn.setObjectName("collapse")
         self.collapse_btn.setFixedSize(40, 32)
         self.collapse_btn.clicked.connect(self.collapse)

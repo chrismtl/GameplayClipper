@@ -3,8 +3,9 @@ import utils.constants as cst
 from engine.matchers.matcher_registry import MATCH_FUNCTIONS
 from tools.frame_extractor import iterate_video
 import utils.json_cacher as js
+import registry.media_registry as mr
 
-def  detect_game_from_video(video_path):
+def detect_game_from_video(video_path):
     """
     Detect the game from the video filename by searching for *_splash templates.
 
@@ -42,8 +43,7 @@ def  detect_game_from_video(video_path):
     detected_games = set()
     for frame_id, frame, _ in iterate_video(video_path, cst.GAME_SEARCH_FRAME_STEP):
         if frame_id > cst.GAME_EVENT_MIN:
-            print(f"❌ No game detected within the first {int(cst.GAME_EVENT_MIN/(30*60))} minutes.")
-            return None, None
+            break  # Stop searching after a certain point
 
         for name, data in starter_events.items():
             roi = data["roi"]
@@ -51,6 +51,7 @@ def  detect_game_from_video(video_path):
             threshold = data.get("threshold", 0.95)
 
             if match_fn is None:
+                print(f"❌ Match function is None for event {name}, skipping...")
                 continue
 
             x1, y1, x2, y2 = roi
@@ -65,6 +66,9 @@ def  detect_game_from_video(video_path):
         elif len(detected_games) == 1:
             game_name = detected_games.pop()
             print(f"✅ Game detected: {cst.FULL_GAME_NAME.get(game_name, game_name)}")
-            return game_name, frame_id
-
-    raise ValueError(f"❌ No game starter event detected in {video_file_name}.")
+            mr.register(video_path, True, game_name, frame_id)
+            return True, game_name
+        
+    print(f"❌ No game starter event detected within the first {int(cst.GAME_EVENT_MIN/(30*60))} minutes in {video_file_name}.")
+    mr.register(video_path, False, None, None)
+    return False, None

@@ -9,7 +9,7 @@ GAME_SEARCH_FRAME_STEP = 30  # Search every 30 frames
 
 CONFIDENCE_PRECISION = 4  # Decimal places for confidence scores
 
-GAME_EVENT_MIN = 10*60*30
+GAME_EVENT_MIN = 60*30
 
 MAX_EVENT_NAME_LEN = 12
 
@@ -25,7 +25,8 @@ FULL_GAME_NAME = {
 # =============== PATHS ===============
 LOGS_DIR = os.path.join("generated", "logs")
 
-MEDIA_DIR = "media"
+MEDIA_DIR = r"C:\Users\Bosstala\Videos\Stream"
+
 
 OUT_DF_DIR = os.path.join("generated","dataframes")
 

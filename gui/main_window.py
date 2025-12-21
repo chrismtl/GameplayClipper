@@ -5,18 +5,19 @@ from __future__ import annotations
 from pathlib import Path
 
 try:
-    from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout
+    from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget
     from PySide6.QtGui import QIcon
 except ImportError:
     try:
-        from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout
+        from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget
         from PyQt6.QtGui import QIcon
     except ImportError:
-        from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout
+        from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget
         from PyQt5.QtGui import QIcon
 
 from gui.navigation.sidebar import SidebarPanel
 from gui.pages.home import HomePage
+from gui.pages.process import ProcessPage
 
 
 class MainWindow(QMainWindow):
@@ -39,7 +40,18 @@ class MainWindow(QMainWindow):
         self.sidebar = SidebarPanel()
         layout.addWidget(self.sidebar)
 
+        self.stack = QStackedWidget()
         self.home_page = HomePage()
-        layout.addWidget(self.home_page, 1)
+        self.process_page = ProcessPage()
+
+        self.home_page.processRequested.connect(self.show_process_page)
+
+        self.stack.addWidget(self.home_page)
+        self.stack.addWidget(self.process_page)
+        layout.addWidget(self.stack, 1)
 
         self.setCentralWidget(container)
+
+    def show_process_page(self) -> None:
+        self.process_page.refresh()
+        self.stack.setCurrentWidget(self.process_page)
